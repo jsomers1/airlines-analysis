@@ -1,0 +1,12 @@
+-- create table for treemaps of 2000 outgoing flights
+CREATE TABLE tree1 AS SELECT a.origin, a.ct, b.state FROM airports_complete2 a JOIN airports b -- ON (a.origin = b.iata);
+-- SELECT * FROM tree1 LIMIT 15;
+
+-- save tree1 table as CSV using HUE
+
+
+
+-- create table for treemaps of 2003 outgoing flights
+CREATE TABLE tree2 AS SELECT a.origin, a.ct, b.state FROM airports_complete3 a JOIN airports b ON (a.origin = b.iata);
+
+-- save tree2 table as CSV using HUE

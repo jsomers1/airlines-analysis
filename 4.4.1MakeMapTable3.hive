@@ -1,0 +1,47 @@
+-- make number of outgoing flights by airport table
+DROP TABLE IF EXISTS flightdata23;
+
+-- see how many distinct airports have flights
+-- SELECT COUNT(DISTINCT Origin) AS uniq FROM airlinedata0003_treated WHERE year = '2000';
+
+-- count number of outgoing flights by airport
+-- SELECT Origin, COUNT(Origin) as ct FROM airlinedata0003_treated WHERE year = '2000' GROUP BY Origin ORDER BY -- ct DESC, Origin LIMIT 20;
+
+-- make flightdata2 table by outgoing flights
+CREATE TABLE flightdata23 AS SELECT Origin, COUNT(Origin) as ct FROM airlinedata0003_treated WHERE year = '2003' GROUP BY Origin ORDER BY ct DESC, Origin;
+
+
+
+-- combine into airports_complete table
+DROP TABLE IF EXISTS airports_complete3;
+
+-- join
+CREATE TABLE airports_complete3 AS SELECT f.origin, a.lat, a.long, f.ct FROM flightdata23 f JOIN airports a ON (f.origin = a.iata);
+
+-- save airports_complete3 table as CSV using HUE, use as first input in R file
+
+
+
+
+-- now make table with start and end lat/long for each flight and numbers of each flight
+DROP TABLE IF EXISTS flightpaths13;
+DROP TABLE IF EXISTS flightpaths23;
+DROP TABLE IF EXISTS distod2;
+
+-- get unique origin-destination pairs
+CREATE TABLE distod3 AS SELECT DISTINCT Origin, Dest FROM airlinedata0003_treated WHERE year = '2003';
+-- SELECT * FROM distod LIMIT 15;
+
+-- get airport abbrev. with lat and long
+--SELECT iata, lat, long FROM airports LIMIT 5;
+
+-- make flightpaths1 table using above queries
+CREATE TABLE flightpaths13 AS SELECT d.origin, a.lat, a.long, d.dest FROM distod3 d JOIN airports a ON (d.origin = a.iata);
+ALTER TABLE flightpaths13 CHANGE lat lat1 DOUBLE;
+ALTER TABLE flightpaths13 CHANGE long long1 DOUBLE;
+
+-- merge with airports again to get second lat / lon pairs
+CREATE TABLE flightpaths23 AS SELECT f.origin, f.lat1, f.long1, f.dest, a.lat, a.long FROM flightpaths13 f JOIN airports a ON (f.dest = a.iata);
+-- SELECT * FROM flightpaths2 LIMIT 15;
+
+-- save flightpaths23 table as CSV using HUE, use as second input in R file
